@@ -3,7 +3,10 @@
 #include <QDebug>
 
 //TODO: better rounding/ceiling on timestamps for longer videos
-//TODO: scrollable timeline
+//TODO: make cursor scrollable
+//TODO: overflow scrollable timeline
+//TODO: read frames into images/pixmaps; ffmpeg?? generate + cache sprites?
+//TODO: render video playback inside video widget
 
 Cursor::Cursor(QWidget* parent) : QWidget(parent){
   qDebug() << "Cursor ctor";
@@ -32,6 +35,7 @@ void Cursor::paintEvent(QPaintEvent *e){
   p.drawRoundedRect(QRectF(0,5,90,45), 10, 10); //current timestamp
   p.drawRect(QRectF(43,5,3,190)); //needle
 
+  //TODO: enable background for better readability?
   // p.setBrush(Qt::black);
   // p.setBrush(QColor(0,0,0,128));
   // p.drawRoundedRect(QRectF(3,8,84,39), 7, 7);
@@ -58,19 +62,13 @@ _duration(duration) {
 void Timeline::paintEvent(QPaintEvent *e){
   qDebug() << "Timeline paintEvent()";
   QPainter p(this);
-  //New settings btn stuff
   p.setRenderHint(QPainter::Antialiasing, true);
   p.setPen(QPen(QColor(0xb2b2b2), 3, Qt::SolidLine, Qt::FlatCap));
-  // p.setBrush(Qt::black);
-  // origin at 1.5,1.5 because qt issues with pixel perfect borders
   p.drawRoundedRect(QRectF(10.5, 55.5, size().width()-13, 128), 20, 20);
 
-  qDebug() << "tl size: " << size();
-
-  float spacing = size().width() / _duration;
-
-
-  qDebug() << "tl spacing: " << spacing;
+  float spacing = size().width() / (int)_duration;
+  // qDebug() << "tl size: " << size();
+  // qDebug() << "tl spacing: " << spacing;
   
   //setup time stamps painter
   QFont font = p.font();
@@ -94,6 +92,15 @@ void Timeline::paintEvent(QPaintEvent *e){
 
 }
 
+Video::Video(QWidget* parent) : QFrame(parent){
+  qDebug() << "Video ctor";
+
+  QHBoxLayout* layout = new QHBoxLayout;
+  setLayout(layout);
+  setFixedSize(1000,800);
+  setStyleSheet(R"( background-color: #101010; )"); //TODO: remove
+}
+
 Player::Player(QWidget* parent) : QFrame(parent){
   qDebug() << "Player ctor";
   QVBoxLayout* main_layout = new QVBoxLayout(this);
@@ -102,16 +109,12 @@ Player::Player(QWidget* parent) : QFrame(parent){
 
   
   Timeline* tline = new Timeline(38,this);
+  Video* vid = new Video(this);
   
 
-  main_layout->addStretch(3);
-  main_layout->addWidget(tline,1);
+  main_layout->addWidget(vid, 0, Qt::AlignCenter);
+  main_layout->addWidget(tline);
 
-  
-
-  // setFixedSize(300,300);
-
-  setStyleSheet(R"( Player { background-color: #444444; }; )");
   setLayout(main_layout);
   
 }

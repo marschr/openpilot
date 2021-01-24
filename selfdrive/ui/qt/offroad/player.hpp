@@ -28,6 +28,14 @@ private:
   float _duration = 10.0;
 };
 
+class Video: public QFrame { //TODO: maybe QWidget
+  Q_OBJECT
+
+public:
+  Video(QWidget* parent = 0);
+  
+};
+
 class Player: public QFrame {
   Q_OBJECT
 
