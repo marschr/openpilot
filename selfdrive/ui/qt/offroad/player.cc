@@ -8,38 +8,49 @@
 Cursor::Cursor(QWidget* parent) : QWidget(parent){
   qDebug() << "Cursor ctor";
 
+  QHBoxLayout* layout = new QHBoxLayout;
+  layout->setContentsMargins(0,10,0,0);
+  layout->setSpacing(0);
+
+  QLabel* cts = new QLabel; //current timestamp
+  // cts->setText(QString::number(current_ts));
+  cts->setText("12:34");
+  cts->setAlignment(Qt::AlignCenter);
+  
+  layout->addWidget(cts, 1 , Qt::AlignTop | Qt::AlignHCenter );
+  setFixedSize(90,200);
+  setLayout(layout);
+  setStyleSheet(R"( background-color: transparent; font-size: 27px; font-weight: 600; )");
 }
 
 void Cursor::paintEvent(QPaintEvent *e){
   qDebug() << "Cursor paintEvent()";
   QPainter p(this);
-  //New settings btn stuff
   p.setRenderHint(QPainter::Antialiasing, true);
   p.setPen(Qt::NoPen);
   p.setBrush(QColor(0xc8a71a));
-  // origin at 1.5,1.5 because qt issues with pixel perfect borders
-  p.drawRoundedRect(QRectF(0,0,90,50), 10, 10);
+  p.drawRoundedRect(QRectF(0,5,90,45), 10, 10); //current timestamp
+  p.drawRect(QRectF(43,5,3,190)); //needle
 
-  p.drawRect(QRectF(43,0,3,190));
+  // p.setBrush(Qt::black);
+  // p.setBrush(QColor(0,0,0,128));
+  // p.drawRoundedRect(QRectF(3,8,84,39), 7, 7);
+
 }
 
 Timeline::Timeline(float duration, QWidget* parent) : QWidget(parent),
 _duration(duration) {
   qDebug() << "Timeline ctor";
 
- 
-  // QHBoxLayout* ts_layout = new QHBoxLayout; //time stamps layout
-
-
   QGridLayout* layout = new QGridLayout;
   Cursor* cursor = new Cursor(this);
-  cursor->setFixedSize(100,200);
+  cursor->current_ts = 12.3;
 
-  layout->setMargin(0);
+  layout->setContentsMargins(0,0,0,0);
   layout->setSpacing(0);
   layout->addWidget(cursor,0,0,Qt::AlignHCenter|Qt::AlignTop);
 
-  setStyleSheet(R"( background-color: red; )");
+  // setStyleSheet(R"( background-color: red; )"); //TODO: remove
 
   setLayout(layout);
 }
@@ -52,7 +63,6 @@ void Timeline::paintEvent(QPaintEvent *e){
   p.setPen(QPen(QColor(0xb2b2b2), 3, Qt::SolidLine, Qt::FlatCap));
   // p.setBrush(Qt::black);
   // origin at 1.5,1.5 because qt issues with pixel perfect borders
-  // p.drawRoundedRect(QRectF(1.5, 1.5, size().width()-3, size().height()-3), 30, 30);
   p.drawRoundedRect(QRectF(10.5, 55.5, size().width()-13, 128), 20, 20);
 
   qDebug() << "tl size: " << size();

@@ -8,6 +8,7 @@ class Cursor : public QWidget {
 
 public:
   Cursor(QWidget* parent = 0);
+  float current_ts = 12.3;
 
 protected:
   void paintEvent(QPaintEvent*) override;
